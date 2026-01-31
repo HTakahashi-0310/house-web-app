@@ -170,29 +170,39 @@
 						<div class="text-center mb-4">
 							<a class="btn text-white shadow-sm w-50 samuraitravel-btn">レビューを投稿する</a>
 						</div>
-						<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
-							<div th:each="review : ${reviews}" class="col">
-								<div class="card h-100">
-									<div class="card-body">
-										<h5 class="card-title" th:text="${review.getUser().getName()}">投稿者名</h5>
 
-										<p class="card-text">
-											<span class="text-warning" th:text="${'★'.repeat(review.rating)}"></span>
-											<span class="text-muted" th:text="${'☆'.repeat(5 - review.rating)}"></span>
-										</p>
+						<!-- レビューが1件も投稿されていない場合 -->
+						<div th:if="${#lists.isEmpty(reviews)}" class="text-center mb-4">
+							<p>まだレビューがありません。</p>
+						</div>
 
-										<p class="card-text">
-											<small class="text-muted"
-												th:text="${#temporals.format(review.createdAt, 'yyyy年MM月dd日')}"></small>
-										</p>
+						<div th:unless="${#lists.isEmpty(reviews)}">
+							<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+								<div th:each="review : ${reviews}" class="col">
+									<div class="card h-100">
+										<div class="card-body">
+											<h5 class="card-title" th:text="${review.getUser().getName()}">投稿者名</h5>
 
-										<p class="card-text" th:text="${review.comment}">レビュー内容がここに入ります。</p>
+											<p class="card-text">
+												<span class="text-warning"
+													th:text="${'★'.repeat(review.rating)}"></span>
+												<span class="text-muted"
+													th:text="${'☆'.repeat(5 - review.rating)}"></span>
+											</p>
+
+											<p class="card-text">
+												<small class="text-muted"
+													th:text="${#temporals.format(review.createdAt, 'yyyy年MM月dd日')}"></small>
+											</p>
+
+											<p class="card-text" th:text="${review.comment}">レビュー内容がここに入ります。</p>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-						<div>
-							<a>すべてのレビューを見る</a>
+							<div>
+								<a>すべてのレビューを見る</a>
+							</div>
 						</div>
 
 					</div>
