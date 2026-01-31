@@ -167,10 +167,30 @@
 						</div>
 
 						<h1 class="mb-4 text-center">レビュー</h1>
-						<div class="text-center">
+						<div class="text-center mb-4">
 							<a class="btn text-white shadow-sm w-50 samuraitravel-btn">レビューを投稿する</a>
 						</div>
-						<div>レビュー一覧</div>
+						<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+							<div th:each="review : ${reviews}" class="col">
+								<div class="card h-100">
+									<div class="card-body">
+										<h5 class="card-title" th:text="${review.getUser().getName()}">投稿者名</h5>
+
+										<p class="card-text">
+											<span class="text-warning" th:text="${'★'.repeat(review.rating)}"></span>
+											<span class="text-muted" th:text="${'☆'.repeat(5 - review.rating)}"></span>
+										</p>
+
+										<p class="card-text">
+											<small class="text-muted"
+												th:text="${#temporals.format(review.createdAt, 'yyyy年MM月dd日')}"></small>
+										</p>
+
+										<p class="card-text" th:text="${review.comment}">レビュー内容がここに入ります。</p>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div>
 							<a>すべてのレビューを見る</a>
 						</div>
