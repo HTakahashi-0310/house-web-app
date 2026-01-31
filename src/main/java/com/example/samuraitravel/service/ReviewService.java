@@ -31,17 +31,17 @@ public class ReviewService {
 			if(myReview.isPresent()) {
 				displayReviews.add(myReview.get());
 				
-				List<Review> otherReviews = reviewRepository.findTop5ByHouseIdAndIdNotOrderByCreatedAtAsc(houseId, myReview.get().getId());
+				List<Review> otherReviews = reviewRepository.findTop5ByHouseIdAndIdNotOrderByCreatedAtDesc(houseId, myReview.get().getId());
 				displayReviews.addAll(otherReviews);
 			}
 			// 未投稿
 			else {
-				displayReviews = reviewRepository.findTop6ByHouseIdOrderByCreatedAtAsc(houseId);
+				displayReviews = reviewRepository.findTop6ByHouseIdOrderByCreatedAtDesc(houseId);
 			}
 		}
 		// 未ログイン
 		else {
-			displayReviews = reviewRepository.findTop6ByHouseIdOrderByCreatedAtAsc(houseId);
+			displayReviews = reviewRepository.findTop6ByHouseIdOrderByCreatedAtDesc(houseId);
 		}
 		
 		return displayReviews;
