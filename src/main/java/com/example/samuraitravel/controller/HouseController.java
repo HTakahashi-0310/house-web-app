@@ -1,9 +1,15 @@
 package com.example.samuraitravel.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,16 +18,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.samuraitravel.entity.House;
+import com.example.samuraitravel.entity.Review;
 import com.example.samuraitravel.form.ReservationInputForm;
 import com.example.samuraitravel.repository.HouseRepository;
+import com.example.samuraitravel.service.ReviewService;
 
 @Controller
 @RequestMapping("/houses")
 public class HouseController {
 	private final HouseRepository houseRepository;
+	private final ReviewService reviewService;
 
-	public HouseController(HouseRepository houseRepository) {
+	public HouseController(HouseRepository houseRepository, ReviewService reviewService) {
 		this.houseRepository = houseRepository;
+		this.reviewService = reviewService;
 	}
 
 	@GetMapping
@@ -76,6 +86,28 @@ public class HouseController {
 
 		model.addAttribute("house", house);
 		model.addAttribute("reservationInputForm", new ReservationInputForm());
+		
+		// 表示用レビュー情報を取得
+		// ユーザー名（メールアドレス）の格納用変数
+		String email = null;
+		// ログイン状態判定用クラスをインスタンス化
+		AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
+		// ログイン情報を取得
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		// ログインの状態により処理を分岐
+		// ログイン済みの場合
+		if(auth != null && trustResolver.isAnonymous(auth) != true) {
+			email = auth.getName();
+		}
+		// 未ログインの場合
+		else {
+			email = null;
+		}
+		
+		// 表示用レビューを取得
+		List<Review> reviews = reviewService.getReviewsForDisplay(id, email);
+		// modelにレビュー情報を追加
+		model.addAttribute("reviews", reviews);
 
 		return "houses/show";
 	}

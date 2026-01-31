@@ -1,0 +1,49 @@
+package com.example.samuraitravel.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.example.samuraitravel.entity.Review;
+import com.example.samuraitravel.repository.ReviewRepository;
+
+@Service
+public class ReviewService {
+	private final ReviewRepository reviewRepository;
+
+    public ReviewService(ReviewRepository reviewRepository) {
+        this.reviewRepository = reviewRepository;
+    }
+    
+    /*
+     * 表示用のレビューリスト取得
+     */
+    public List<Review> getReviewsForDisplay(Integer houseId, String email) {
+		List<Review> displayReviews = new ArrayList<>();
+		
+		// ログインしている場合
+		if(email != null) {
+			Optional<Review> myReview = reviewRepository.findByHouseIdAndUserEmail(houseId, email);
+			
+			// ログイン済みかつ投稿済み
+			if(myReview.isPresent()) {
+				displayReviews.add(myReview.get());
+				
+				List<Review> otherReviews = reviewRepository.findTop5ByHouseIdAndIdNotOrderByCreatedAtAsc(houseId, myReview.get().getId());
+				displayReviews.addAll(otherReviews);
+			}
+			// 未投稿
+			else {
+				displayReviews = reviewRepository.findTop6ByHouseIdOrderByCreatedAtAsc(houseId);
+			}
+		}
+		// 未ログイン
+		else {
+			displayReviews = reviewRepository.findTop6ByHouseIdOrderByCreatedAtAsc(houseId);
+		}
+		
+		return displayReviews;
+	}
+}
